@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="css/first-custom-theme.css"/>
+    <link rel="stylesheet" href="css/jquery.mobile.icons.min.css"/>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css"/>
+    <script src="js/jquery-1.11.1.js"></script>
+    <script src="js/jquery.mobile-1.4.5.js"></script>
+    <script src="js/game.js"></script>
+    <meta charset="UTF-8">
+    <style>
+        #basic-actions {
+            height:100%;
+        }
+        #basic-actions li {
+            height: 20%;
+        }
+    </style>
+    <script>
+        var timer;
+        var playing = false;
+
+        $(function () {
+            $("[data-role='header'], [data-role='footer']").toolbar();
+            $('#slider-energy').slider();
+            $('#slider-food').slider();
+            $('#slider-mood').slider();
+
+            retrievePlayer();
+            showCurrentData(player);
+            play();
+
+        });
+
+        function tick() {
+            if (isDead(player)) {
+                // Show dialog that finished
+                clearInterval(timer);
+            } else {
+                player.day++;
+                player.energy -= 0.8;
+                player.food -= 0.5;
+                player.mood -= 0.3;
+
+                update(player);
+            }
+        }
+
+        function update(player) {
+            savePlayer(player);
+            showCurrentData(player);
+        }
+
+        function pause() {
+            if (playing) {
+                clearInterval(timer);
+                $('#pause').addClass('ui-disabled');
+                $('#play').removeClass('ui-disabled');
+                $('#basic-actions').addClass('ui-disabled');
+                playing = false;
+            }
+        }
+
+        function play() {
+            if (!playing) {
+                playing = true;
+                timer = window.setInterval(tick, 3000);
+                $('#pause').removeClass('ui-disabled');
+                $('#play').addClass('ui-disabled');
+                $('#basic-actions').removeClass('ui-disabled');
+            }
+        }
+
+        function showCurrentData(player) {
+            $('#money').text(player.money);
+            $('#day').text(player.day);
+
+            $('#slider-energy').val(player.energy).slider("refresh");
+            $('#slider-food').val(player.food).slider("refresh");
+            $('#slider-mood').val(player.mood).slider("refresh");
+
+            if(isDead(player)){
+                $('#play').addClass('ui-disabled');
+                $('#basic-actions').addClass('ui-disabled');
+            }
+        }
+    </script>
+    <title>Life Simulator Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+</head>
+<body>
+<header data-role="header" data-position="fixed" data-theme="c">
+    <h1>Life Simulation</h1>
+    <div style="margin-left: 10px;margin-right: 10px">
+        <div class="ui-grid-b" align="center">
+            <div class="ui-block-a">
+                <h2>Day <span id="day">0</span></h2>
+            </div>
+            <div class="ui-block-b">
+                <h2><span id="money">0</span> &euro;</h2>
+            </div>
+            <div class="ui-block-c">
+                <a id="pause" href="#" class="ui-btn ui-corner-all ui-shadow" onclick="pause()">Pause</a>
+                <a id="play" href="#" class="ui-btn ui-corner-all ui-shadow" onclick="play()">Play </a>
+            </div>
+        </div>
+        <div data-mini="true">
+            <label for="slider-energy">Energy</label>
+            <input type="range" name="slider-2" id="slider-energy" data-highlight="true" min="0" max="100"
+                   value="100" disabled="disabled">
+            <label for="slider-food">Food</label>
+            <input type="range" name="slider-2" id="slider-food" data-highlight="true" min="0" max="100"
+                   value="100" disabled="disabled">
+            <label for="slider-mood">Mood</label>
+            <input type="range" name="slider-2" id="slider-mood" data-highlight="true" min="0" max="100"
+                   value="100" disabled="disabled">
+        </div>
+    </div>
+    <nav data-role="navbar">
+        <ul>
+            <li><a href="#game" data-icon="home" class="ui-btn-active ui-state-persist"></a></li>
+            <li><a href="#work" data-icon="calendar"></a></li>
+            <li><a href="#education" data-icon="clock"></a></li>
+            <li><a href="#shop" data-icon="shop"></a></li>
+        </ul>
+    </nav>
+</header>
+<section data-role="page" id="game">
+    <div class="ui-content">
+        <ul id="basic-actions" data-role="listview" data-inset="false">
+            <li><a href="#" onclick="earn(player);update(player)">
+                    <h1>Earn <span style="color:red">2 &euro;</span></h1>
+                    No money? Get some money ..
+                    </a></li>
+            <li><a href="#" onclick="sleep(player);update(player)">
+                    <h1>Sleep in a hotel <span style="color:red">-10 &euro;</span></h1>
+                    You are homeless ..
+                    </a></li>
+            <li><a href="#" onclick="eat(player);update(player)">
+                    <h1>Eat kebap <span style="color:red">-3 &euro;</span></h1>
+                    </a></li>
+            <li><a href="#" onclick="fun(player);update(player)">
+                    <h1>Go to the cinema <span style="color:red">-6 &euro;</span></h1>
+                    </a></li>
+        </ul>
+    </div>
+</section>
+<section data-role="page" id="work">
+    <div data-role="content">
+        <h3>Work</h3>
+    </div>
+</section>
+<section data-role="page" id="education">
+    <div data-role="content">
+        <h3>Education</h3>
+    </div>
+</section>
+<section data-role="page" id="shop">
+    <div data-role="content">
+        <h3>Shop</h3>
+    </div>
+</section>
+<footer data-role="footer" data-position="fixed" data-theme="c" data-fullscreen="false">
+    <h2>(c) by Mathias Nigsch</h2>
+    <!-- Add dialog -->
+    <a href="#" id="reset" class="ui-btn ui-icon-delete ui-btn-icon-left ui-btn-left ui-btn-corner-all"
+       onclick="resetPlayer();showCurrentData(player);play()">Reset</a>
+</footer>
+</body>
+</html>
