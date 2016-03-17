@@ -7,24 +7,52 @@
     <script src="js/jquery-1.11.1.js"></script>
     <script src="js/jquery.mobile-1.4.5.js"></script>
     <script src="js/game.js"></script>
+    <script src="js/tools.js"></script>
     <meta charset="UTF-8">
     <style>
         #basic-actions {
-            height:100%;
+            height: 100%;
         }
+
         #basic-actions li {
             height: 20%;
+        }
+
+        #energy #food #mood .ui-slider-bg {
+            -webkit-transition: background-color 1s;
+            transition: background-color 1s;
         }
     </style>
     <script>
         var timer;
         var playing = false;
 
+        //        $(document).on("pagecreate", "#game", function () {
+        //
+        //        });
+
         $(function () {
             $("[data-role='header'], [data-role='footer']").toolbar();
-            $('#slider-energy').slider();
-            $('#slider-food').slider();
-            $('#slider-mood').slider();
+
+            var energy = $('#slider-energy').slider();
+            var food = $('#slider-food').slider();
+            var mood = $('#slider-mood').slider();
+
+            HighlightColor(energy);
+            HighlightColor(food);
+            HighlightColor(mood);
+
+            energy.on("change", function () {
+                HighlightColor($(this));
+            });
+
+            food.on("change", function () {
+                HighlightColor($(this));
+            });
+
+            mood.on("change", function () {
+                HighlightColor($(this));
+            });
 
             retrievePlayer();
             showCurrentData(player);
@@ -79,9 +107,10 @@
             $('#slider-food').val(player.food).slider("refresh");
             $('#slider-mood').val(player.mood).slider("refresh");
 
-            if(isDead(player)){
+            if (isDead(player)) {
                 $('#play').addClass('ui-disabled');
                 $('#basic-actions').addClass('ui-disabled');
+               // $.mobile.changePage('#gameOverDialog', {transition: 'pop', role: 'dialog'});
             }
         }
     </script>
@@ -105,15 +134,22 @@
             </div>
         </div>
         <div data-mini="true">
-            <label for="slider-energy">Energy</label>
-            <input type="range" name="slider-2" id="slider-energy" data-highlight="true" min="0" max="100"
-                   value="100" disabled="disabled">
-            <label for="slider-food">Food</label>
-            <input type="range" name="slider-2" id="slider-food" data-highlight="true" min="0" max="100"
-                   value="100" disabled="disabled">
-            <label for="slider-mood">Mood</label>
-            <input type="range" name="slider-2" id="slider-mood" data-highlight="true" min="0" max="100"
-                   value="100" disabled="disabled">
+            <div id="energy">
+                <label for="slider-energy">Energy</label>
+                <input type="range" name="slider-energy" id="slider-energy" data-highlight="true" min="0" max="100"
+                       value="100" disabled="disabled">
+            </div>
+
+            <div id="food">
+                <label for="slider-food">Food</label>
+                <input type="range" name="slider-2" id="slider-food" data-highlight="true" min="0" max="100"
+                       value="100" disabled="disabled">
+            </div>
+            <div id="mood">
+                <label for="slider-mood">Mood</label>
+                <input type="range" name="slider-2" id="slider-mood" data-highlight="true" min="0" max="100"
+                       value="100" disabled="disabled">
+            </div>
         </div>
     </div>
     <nav data-role="navbar">
@@ -129,12 +165,14 @@
     <div class="ui-content">
         <ul id="basic-actions" data-role="listview" data-inset="false">
             <li><a href="#" onclick="earn(player);update(player)">
-                    <h1>Earn <span style="color:red">2 &euro;</span></h1>
-                    No money? Get some money ..
+                    <h1>Earn <span style="color:green">2 &euro;</span></h1>
+                    
+                <small>No money? Get some money ..</small>
                     </a></li>
             <li><a href="#" onclick="sleep(player);update(player)">
                     <h1>Sleep in a hotel <span style="color:red">-10 &euro;</span></h1>
-                    You are homeless ..
+                   
+                <small> You are homeless ..</small>
                     </a></li>
             <li><a href="#" onclick="eat(player);update(player)">
                     <h1>Eat kebap <span style="color:red">-3 &euro;</span></h1>

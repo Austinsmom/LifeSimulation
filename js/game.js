@@ -7,35 +7,35 @@ var houses = {
     'small-appartment': 2,
     'small-house': 3,
     'villa': 4
-}
+};
 var beds = {
     'floor': 15,
     'hotel': 25,
     'cheap-bed': 20
-}
+};
 
 var foods = {
     'kebap': 15,
     'frozen-pizza': 20,
     'steak': 35
-}
+};
 
 var moods = {
     'cinema': 15,
     'computer-game': 30
-}
+};
 
 var works = {
     'none': 0
-}
+};
 
 var educations = {
     'none': 0
-}
+};
 
 var hobbies = {
     'none': 0
-}
+};
 
 var player = {
     'name': 'player',
