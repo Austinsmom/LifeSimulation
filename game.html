@@ -38,6 +38,7 @@
             var food = $('#slider-food').slider();
             var mood = $('#slider-mood').slider();
 
+            // Colored progress bar: https://jqmtricks.wordpress.com/2014/04/21/fun-with-the-slider-widget/
             HighlightColor(energy);
             HighlightColor(food);
             HighlightColor(mood);
@@ -61,7 +62,7 @@
         });
 
         function tick() {
-            if (isDead(player)) {
+            if (player.isDead()) {
                 // Show dialog that finished
                 clearInterval(timer);
             } else {
@@ -107,7 +108,7 @@
             $('#slider-food').val(player.food).slider("refresh");
             $('#slider-mood').val(player.mood).slider("refresh");
 
-            if (isDead(player)) {
+            if (player.isDead()) {
                 $('#play').addClass('ui-disabled');
                 $('#basic-actions').addClass('ui-disabled');
                // $.mobile.changePage('#gameOverDialog', {transition: 'pop', role: 'dialog'});
@@ -164,20 +165,20 @@
 <section data-role="page" id="game">
     <div class="ui-content">
         <ul id="basic-actions" data-role="listview" data-inset="false">
-            <li><a href="#" onclick="earn(player);update(player)">
+            <li><a href="#" onclick="player.earn();update(player)">
                     <h1>Earn <span style="color:green">2 &euro;</span></h1>
                     
                 <small>No money? Get some money ..</small>
                     </a></li>
-            <li><a href="#" onclick="sleep(player);update(player)">
+            <li><a href="#" onclick="player.sleep();update(player)">
                     <h1>Sleep in a hotel <span style="color:red">-10 &euro;</span></h1>
                    
                 <small> You are homeless ..</small>
                     </a></li>
-            <li><a href="#" onclick="eat(player);update(player)">
+            <li><a href="#" onclick="player.eat();update(player)">
                     <h1>Eat kebap <span style="color:red">-3 &euro;</span></h1>
                     </a></li>
-            <li><a href="#" onclick="fun(player);update(player)">
+            <li><a href="#" onclick="player.fun();update(player)">
                     <h1>Go to the cinema <span style="color:red">-6 &euro;</span></h1>
                     </a></li>
         </ul>

@@ -9,19 +9,42 @@ var houses = {
     'villa': 4
 };
 var beds = {
-    'floor': 15,
-    'hotel': 25,
+    'floor': {
+        'price': -1,
+        'energy': 10,
+        'food': -4,
+        'mood': -4,
+        'experience': 1
+    },
+    'hotel': {
+        'price': -6,
+        'energy': 20,
+        'food': -3,
+        'mood': -1,
+        'experience': 1
+    },
     'cheap-bed': 20
 };
 
 var foods = {
-    'kebap': 15,
+    'kebap': {
+        'price': -1,
+        'energy': -4,
+        'food': 15,
+        'mood': -2,
+        'experience': 0.5
+    },
     'frozen-pizza': 20,
     'steak': 35
 };
 
 var moods = {
-    'cinema': 15,
+    'cinema': {
+        'price': -6,
+        'mood': 15,
+        'experience': 0.2,
+        'food': -2
+    },
     'computer-game': 30
 };
 
@@ -40,6 +63,7 @@ var hobbies = {
 var player = {
     'name': 'player',
     'day': 1,
+    'experience': 0,
     'money': 100,
     'energy': 100,
     'max_energy': 100,
@@ -51,14 +75,62 @@ var player = {
     'bed': beds.hotel,
     'foodsource': foods.kebap,
     'moodsource': moods.cinema,
-    'work': works.none,
+    'company': works.none,
     'education': educations.none,
-    'hobby': hobbies.none
+    'hobby': hobbies.none,
+    isDead: function () {
+        return !!(this.food < 1 || this.energy < 1 || this.mood < 1);
+    },
+    eat: function () {
+        if (this.money >= -this.foodsource.price) {
+            this.money += this.foodsource.price;
+            this.energy += this.foodsource.energy;
+            this.food += this.foodsource.food;
+            this.mood += this.foodsource.mood;
+            this.experience += this.foodsource.experience;
+        }
+    },
+    sleep: function () {
+        if (this.money >= -this.bed.price) {
+            this.money += this.bed.price;
+            this.energy += this.bed.energy;
+            this.food += this.bed.food;
+            this.mood += this.bed.mood;
+            this.experience += this.bed.experience;
+        }
+    },
+    fun: function () {
+        if (this.money >= -this.moodsource.price) {
+            this.money += this.moodsource.price;
+            this.energy += this.moodsource.energy;
+            this.food += this.moodsource.food;
+            this.mood += this.moodsource.mood;
+            this.experience += this.moodsource.experience;
+        }
+    },
+    earn: function () {
+        this.money += 2;
+        this.energy -= 1;
+        this.food -= 0.5;
+        this.mood -= 0.5;
+        this.experience += 2;
+    },
+    learn: function (study) {
+
+    },
+    work: function (what) {
+
+    },
+    getLevel: function () {
+
+    }
+
 };
 
 var default_player = {
     'name': 'player',
     'day': 1,
+    'experience': 0,
     'money': 100,
     'energy': 100,
     'max_energy': 100,
@@ -70,10 +142,14 @@ var default_player = {
     'bed': beds.hotel,
     'foodsource': foods.kebap,
     'moodsource': moods.cinema,
-    'work': works.none,
+    'company': works.none,
     'education': educations.none,
     'hobby': hobbies.none
 };
+
+function saveObjects(key, objects) {
+    localStorage.setItem(key, JSON.stringify(objects));
+}
 
 // Get the objects from a given name
 function getObjects(key) {
@@ -85,12 +161,9 @@ function getObjects(key) {
     return objects;
 }
 
-function saveObjects(key, objects) {
-    localStorage.setItem(key, JSON.stringify(objects));
-}
-
 function retrievePlayer() {
-    player = getObjects("player");
+    var data = getObjects("player");
+    copyPlayerData(data, player);
 }
 function savePlayer(player) {
     saveObjects("player", player);
@@ -101,44 +174,23 @@ function resetPlayer() {
     retrievePlayer();
 }
 
-function isDead(player) {
-    if (player.food < 1 || player.energy < 1 || player.mood < 1) {
-        return true;
-    } else {
-        return false;
-    }
-}
+function copyPlayerData(from, to) {
+    to.name = from.name;
+    to.day = from.day;
+    to.experience = from.experience;
+    to.money = from.money;
 
-function earn(player) {
-    player.money += 2;
-    player.energy -= 1;
-    player.food -= 0.5;
-    player.mood -= 0.5;
-}
-
-function sleep(player) {
-    if (player.money >= 10) {
-        player.money -= 10;
-        player.energy += player.bed;
-        player.mood -= 2;
-        player.food -= 4;
-    }
-}
-
-function eat(player) {
-    if (player.money >= 3) {
-        player.money -= 3;
-        player.energy -= 4;
-        player.food += player.foodsource;
-        player.mood -= 2;
-    }
-}
-
-function fun(player) {
-    if (player.money >= 6) {
-        player.money -= 6;
-        player.energy -= 2;
-        player.food -= 2;
-        player.mood += player.moodsource;
-    }
+    to.energy = from.energy;
+    to.max_energy = from.max_energy;
+    to.food = from.food;
+    to.max_food = from.max_food;
+    to.mood = from.mood;
+    to.max_mood = from.max_mood;
+    to.house = from.house;
+    to.bed = from.bed;
+    to.foodsource = from.foodsource;
+    to.moodsource = from.moodsource;
+    to.company = from.company;
+    to.education = from.education;
+    to.hobby = from.hobby;
 }
