@@ -1,6 +1,11 @@
 /**
  * Created by Mathias on 17/03/2016.
  */
+
+/**
+ * Highlights the given slider with a color based on its value.
+ * @param slider The slider to modify.
+ */
 function HighlightColor(slider) {
     var theVal = slider.val();
     var color = "6FCC43"; //"#28c2fc";

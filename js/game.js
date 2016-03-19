@@ -60,6 +60,10 @@ var hobbies = {
     'none': 0
 };
 
+/**
+ * Represents a player.
+ * @type {{name: string, day: number, experience: number, money: number, energy: number, max_energy: number, food: number, max_food: number, mood: number, max_mood: number, house: number, bed: (beds.hotel|{price, energy, food, mood, experience}), foodsource: (foods.kebap|{price, energy, food, mood, experience}), moodsource: (moods.cinema|{price, mood, experience, food}), company: number, education: number, hobby: number, isDead: player.isDead, eat: player.eat, sleep: player.sleep, fun: player.fun, earn: player.earn, learn: player.learn, work: player.work, getLevel: player.getLevel}}
+ */
 var player = {
     'name': 'player',
     'day': 1,
@@ -147,6 +151,11 @@ var default_player = {
     'hobby': hobbies.none
 };
 
+/**
+ * Saves given objects to HTML5 storage via JSON.
+ * @param key The key where to store.
+ * @param objects The objects to store.
+ */
 function saveObjects(key, objects) {
     localStorage.setItem(key, JSON.stringify(objects));
 }
@@ -161,19 +170,36 @@ function getObjects(key) {
     return objects;
 }
 
+/**
+ * Retrieves the player from the database.
+ */
 function retrievePlayer() {
     var data = getObjects("player");
     copyPlayerData(data, player);
 }
+
+/**
+ * Saves a player in the local storage.
+ * @param player
+ */
 function savePlayer(player) {
     saveObjects("player", player);
 }
 
+/**
+ * Resets the player to the default values.
+ */
 function resetPlayer() {
     savePlayer(default_player);
     retrievePlayer();
 }
 
+/**
+ * This function copies the data from the retrieved player to the current player object.
+ * With this function, the function in the object are preserved.
+ * @param from Retrieved player from HTML5 Storage
+ * @param to Current player object.
+ */
 function copyPlayerData(from, to) {
     to.name = from.name;
     to.day = from.day;
