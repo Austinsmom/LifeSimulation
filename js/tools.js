@@ -8,7 +8,7 @@
  */
 function HighlightColor(slider) {
     var theVal = slider.val();
-    var color = "6FCC43"; //"#28c2fc";
+    var color = "#6FCC43"; //"#28c2fc";
     if (theVal < 20) {
         color = "#D92727";
     } else if (theVal < 40) {
@@ -17,6 +17,10 @@ function HighlightColor(slider) {
         color = "#FFE433";
     } else if (theVal < 80) {
         color = "#6FCC43";
+    }else{
+        color = "#6FCC43";
     }
-    slider.closest(".ui-slider").find(".ui-slider-bg").css("background-color", color);
+    // .find("div.ui-slider-bg, div.ui-btn-active")
+    slider.closest(".ui-slider").find("[class*='ui-slider-bg']").css("background", color);
 }
+//*[@id="energy"]/div/div/div

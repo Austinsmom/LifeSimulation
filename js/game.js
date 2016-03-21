@@ -10,7 +10,7 @@ var houses = {
 };
 var beds = {
     'floor': {
-        'price': -1,
+        'price': 0,
         'energy': 10,
         'food': -4,
         'mood': -4,
@@ -23,29 +23,54 @@ var beds = {
         'mood': -1,
         'experience': 1
     },
-    'cheap-bed': 20
+    'cheap-bed': {
+        'price': 0,
+        'energy': 15,
+        'food': -3,
+        'mood': -1,
+        'experience': 1
+    }
 };
 
 var foods = {
     'kebap': {
-        'price': -1,
+        'price': -3,
         'energy': -4,
         'food': 15,
         'mood': -2,
         'experience': 0.5
     },
-    'frozen-pizza': 20,
-    'steak': 35
+    'frozen-pizza': {
+        'price': -3.5,
+        'energy': -5,
+        'food': 20,
+        'mood': -5,
+        'experience': 0.5
+    },
+    'steak': {
+        'price': -3.5,
+        'energy': -5.5,
+        'food': 35,
+        'mood': -4,
+        'experience': 1
+    }
 };
 
 var moods = {
     'cinema': {
         'price': -6,
+        'energy': -3,
         'mood': 15,
         'experience': 0.2,
         'food': -2
     },
-    'computer-game': 30
+    'computer-game': {
+        'price': -0.5,
+        'energy': -3,
+        'mood': 30,
+        'experience': 1,
+        'food': -5
+    }
 };
 
 var works = {
@@ -62,7 +87,6 @@ var hobbies = {
 
 /**
  * Represents a player.
- * @type {{name: string, day: number, experience: number, money: number, energy: number, max_energy: number, food: number, max_food: number, mood: number, max_mood: number, house: number, bed: (beds.hotel|{price, energy, food, mood, experience}), foodsource: (foods.kebap|{price, energy, food, mood, experience}), moodsource: (moods.cinema|{price, mood, experience, food}), company: number, education: number, hobby: number, isDead: player.isDead, eat: player.eat, sleep: player.sleep, fun: player.fun, earn: player.earn, learn: player.learn, work: player.work, getLevel: player.getLevel}}
  */
 var player = {
     'name': 'player',
@@ -190,8 +214,14 @@ function savePlayer(player) {
  * Resets the player to the default values.
  */
 function resetPlayer() {
+    deletePlayer();
     savePlayer(default_player);
     retrievePlayer();
+}
+
+function deletePlayer() {
+    // localStorage.clear(); // could also be used
+    localStorage.removeItem("player");
 }
 
 /**

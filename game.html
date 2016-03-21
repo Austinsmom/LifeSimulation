@@ -10,17 +10,22 @@
     <script src="js/tools.js"></script>
     <meta charset="UTF-8">
     <style>
-        #basic-actions {
-            height: 100%;
-        }
-
-        #basic-actions li {
-            height: 20%;
-        }
-
         #energy #food #mood .ui-slider-bg {
             -webkit-transition: background-color 1s;
             transition: background-color 1s;
+        }
+        .ui-li-static.ui-collapsible > .ui-collapsible-heading {
+                margin: 0;
+        }
+        .ui-li-static.ui-collapsible {
+                padding: 0;
+        }
+        .ui-li-static.ui-collapsible > .ui-collapsible-heading > .ui-btn {
+                border-top-width: 0;
+        }
+        .ui-li-static.ui-collapsible > .ui-collapsible-heading.ui-collapsible-heading-collapsed > .ui-btn,
+        .ui-li-static.ui-collapsible > .ui-collapsible-content {
+                border-bottom-width: 0;
         }
     </style>
     <script>
@@ -31,17 +36,16 @@
         //
         //        });
 
+        var energy, food, mood;
+
         $(function () {
             $("[data-role='header'], [data-role='footer']").toolbar();
 
-            var energy = $('#slider-energy').slider();
-            var food = $('#slider-food').slider();
-            var mood = $('#slider-mood').slider();
+            energy = $('#slider-energy').slider();
+            food = $('#slider-food').slider();
+            mood = $('#slider-mood').slider();
 
             // Colored progress bar: https://jqmtricks.wordpress.com/2014/04/21/fun-with-the-slider-widget/
-            HighlightColor(energy);
-            HighlightColor(food);
-            HighlightColor(mood);
 
             energy.on("change", function () {
                 HighlightColor($(this));
@@ -55,11 +59,21 @@
                 HighlightColor($(this));
             });
 
+            HighlightColor(energy);
+            HighlightColor(food);
+            HighlightColor(mood);
+
             retrievePlayer();
             showCurrentData(player);
             play();
 
         });
+
+        function resetProgressBarColors() {
+            HighlightColor(energy);
+            HighlightColor(food);
+            HighlightColor(mood);
+        }
 
         function tick() {
             if (player.isDead()) {
@@ -70,6 +84,7 @@
                 player.energy -= 0.8;
                 player.food -= 0.5;
                 player.mood -= 0.3;
+                player.experience += 0.1;
 
                 update(player);
             }
@@ -100,6 +115,12 @@
             }
         }
 
+        function restart() {
+            playing = false;
+            clearInterval(timer);
+            play();
+        }
+
         function showCurrentData(player) {
             $('#money').text(player.money);
             $('#day').text(player.day);
@@ -111,7 +132,7 @@
             if (player.isDead()) {
                 $('#play').addClass('ui-disabled');
                 $('#basic-actions').addClass('ui-disabled');
-               // $.mobile.changePage('#gameOverDialog', {transition: 'pop', role: 'dialog'});
+                // $.mobile.changePage('#gameOverDialog', {transition: 'pop', role: 'dialog'});
             }
         }
     </script>
@@ -127,7 +148,7 @@
                 <h2>Day <span id="day">0</span></h2>
             </div>
             <div class="ui-block-b">
-                <h2><span id="money">0</span> &euro;</h2>
+                <h2><span id="money">0</span><span id="money-per-day"> (+ 0)</span> &euro;</h2>
             </div>
             <div class="ui-block-c">
                 <a id="pause" href="#" class="ui-btn ui-corner-all ui-shadow" onclick="pause()">Pause</a>
@@ -184,14 +205,30 @@
         </ul>
     </div>
 </section>
-<section data-role="page" id="work">
+<div data-role="page" id="work">
     <div data-role="content">
-        <h3>Work</h3>
+        <ul id="work-actions" data-role="listview">
+            <li><a href="#" onclick="player.applyForJob();update(player)">
+                    <h1>Apply for job</h1>
+                <small>You have to find a job to earn money..</small>
+                    </a></li>
+            <li data-role="collapsible" data-inset="false" data-iconpos="right">
+                <h1>Bike renting <span style="color:green">0 &euro;/day</span></h1>    
+                <ul data-role="listview" data-theme="b">
+                    <li><a href="#" onclick="player.eat();update(player)">
+                           <h1>Buy bike to rent <span style="color:red">-50 &euro;</span></h1>
+                            </a></li>
+                    <li><a href="#" onclick="player.fun();update(player)">
+                            <h1>Sell bike <span style="color:green">+50 &euro;</span></h1>
+                            </a></li>
+                </ul>
+            </li>
+        </ul>
     </div>
-</section>
+</div>
 <section data-role="page" id="education">
     <div data-role="content">
-        <h3>Education</h3>
+
     </div>
 </section>
 <section data-role="page" id="shop">
@@ -203,7 +240,7 @@
     <h2>(c) by Mathias Nigsch</h2>
     <!-- Add dialog -->
     <a href="#" id="reset" class="ui-btn ui-icon-delete ui-btn-icon-left ui-btn-left ui-btn-corner-all"
-       onclick="resetPlayer();showCurrentData(player);play()">Reset</a>
+       onclick="resetPlayer();resetProgressBarColors();showCurrentData(player);restart()">Reset</a>
 </footer>
 </body>
 </html>
