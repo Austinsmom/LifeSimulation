@@ -77,11 +77,7 @@
             if (player.isDead()) {
                 handlePlayerDeath();
             } else {
-                player.day++;
-                player.energy -= 0.8;
-                player.food -= 0.5;
-                player.mood -= 0.3;
-                player.experience += 0.1;
+                player.tick();
 
                 update(player);
 
@@ -244,12 +240,12 @@
                 <small>You have to find a job to earn money..</small>
                     </a></li>
             <li data-role="collapsible" data-inset="false" data-iconpos="right">
-                <h1>Bike renting <span style="color:green">0 &euro;/day</span></h1>    
+                <h1>Bike renting <span style="color:green">0 &euro;/day </span></h1>    
                 <ul data-role="listview" data-theme="b">
-                    <li><a href="#" onclick="player.eat();update(player)">
+                    <li><a href="#" onclick="player.buyBike();update(player)">
                            <h1>Buy bike to rent <span style="color:red">-50 &euro;</span></h1>
                             </a></li>
-                    <li><a href="#" onclick="player.fun();update(player)">
+                    <li><a href="#" onclick="player.sellBike();update(player)">
                             <h1>Sell bike <span style="color:green">+50 &euro;</span></h1>
                             </a></li>
                 </ul>
@@ -260,7 +256,9 @@
 <section data-role="page" id="education">
     <div data-role="content">
         <ul id="education-actions" data-role="listview">
-            <li></li>
+            <li><a href="#" onclick="player.learn(educations.university);update(player)">
+                    <h1>Study at University <span style="color:red">-3 &euro;/day</span></h1>
+                    </a></li>
         </ul>
     </div>
 </section>

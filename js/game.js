@@ -2,6 +2,32 @@
  * Created by Mathias on 17/03/2016.
  */
 
+var rents = {
+    'bike': {
+        'unlock_exp': 100,
+        'price': -50,
+        'sellprice': 40,
+        'earn_per_day': 10,
+        'exp_per_day': 1,
+        'max_amount': 10,
+    },
+    'car': {
+        'unlock_exp': 1000,
+        'price': -10000,
+        'sellprice': 6000,
+        'earn_per_day': 100,
+        'exp_per_day': 5,
+
+    },
+    'apparment': {
+        'unlock_exp': 10000,
+        'price': -250000,
+        'sellprice': 180000,
+        'earn_per_day': 1000,
+        'exp_per_day': 10
+    }
+};
+
 var houses = {
     'homeless': 0,
     'small-appartment': 2,
@@ -74,90 +100,190 @@ var moods = {
 };
 
 var works = {
-    'none': 0
+    'none': 0,
+    'renting_company_worker': {
+        'unlock_exp': 1500,
+        'price': 0,
+        'sellprice': 0,
+        'earn_per_day': 50,
+        'exp_per_day': 50
+    },
+    'renting_company_manager': {
+        'unlock_exp': 5000,
+        'price': 0,
+        'sellprice': 0,
+        'earn_per_day': 100,
+        'exp_per_day': 100
+    },
+    'renting_company_boss': {
+        'unlock_exp': 10000,
+        'price': 0,
+        'sellprice': 0,
+        'earn_per_day': 2000,
+        'exp_per_day': 400
+    },
+    'bike_production_company_small': {
+        'unlock_exp': 4000,
+        'price': -10000,
+        'sellprice': 7000,
+        'earn_per_day': 2000,
+        'exp_per_day': 400,
+        'base_production': 5,
+        'bikes_per_worker': 1,
+        'max_workers': 10
+    },
+    'bike_production_company_med': {
+        'unlock_exp': 6000,
+        'price': -20000,
+        'sellprice': 15000,
+        'earn_per_day': 2000,
+        'exp_per_day': 600,
+        'base_production': 10,
+        'bikes_per_worker': 1.5,
+        'max_workers': 50
+    }
+    // TODO: make option to hire new workers to earn more money (which also costs money)
 };
 
 var educations = {
-    'none': 0
+    'none': {
+        'progress': 0,
+        'cost_per_day': 0,
+        'energy': 0,
+        'mood': 0,
+        'experience': 0,
+        'food': 0
+    },
+    'university': {
+        'progress': 0,
+        'cost_per_day': -3,
+        'energy': -3,
+        'mood': -3,
+        'experience': 10,
+        'food': -5
+    }
 };
 
-var hobbies = {
-    'none': 0
+var skills = {
+    'none': 0,
+    'drawing': {},
+    'programming': {}
 };
 
 /**
  * Represents a player.
  */
 var player = {
-    'name': 'player',
-    'day': 1,
-    'experience': 0,
-    'money': 100,
-    'energy': 100,
-    'max_energy': 100,
-    'food': 100,
-    'max_food': 100,
-    'mood': 100,
-    'max_mood': 100,
-    'house': houses.homeless,
-    'bed': beds.hotel,
-    'foodsource': foods.kebap,
-    'moodsource': moods.cinema,
-    'company': works.none,
-    'education': educations.none,
-    'hobby': hobbies.none,
-    isDead: function () {
-        return !!(this.food <= 0 || this.energy <= 0 || this.mood <= 0);
-    },
-    eat: function () {
-        if (this.money >= -this.foodsource.price) {
-            this.money += this.foodsource.price;
-            this.energy += this.foodsource.energy;
-            this.food += this.foodsource.food;
-            this.mood += this.foodsource.mood;
-            this.experience += this.foodsource.experience;
+        'name': 'player',
+        'day': 1,
+        'experience': 0,
+        'money': 100,
+        'energy': 100,
+        'max_energy': 100,
+        'food': 100,
+        'max_food': 100,
+        'mood': 100,
+        'max_mood': 100,
+        'rent': {
+            'bikes': 0,
+            'cars': 0,
+            'appartments': 0
+        },
+        'house': houses.homeless,
+        'bed': beds.hotel,
+        'foodsource': foods.kebap,
+        'moodsource': moods.cinema,
+        'company': works.none,
+        'education': educations.none,
+        'skill': skills.none,
+        isDead: function () {
+            return !!(this.food <= 0 || this.energy <= 0 || this.mood <= 0);
         }
-    },
-    sleep: function () {
-        if (this.money >= -this.bed.price) {
-            this.money += this.bed.price;
-            this.energy += this.bed.energy;
-            this.food += this.bed.food;
-            this.mood += this.bed.mood;
-            this.experience += this.bed.experience;
+        ,
+        eat: function () {
+            if (this.money >= -this.foodsource.price) {
+                this.money += this.foodsource.price;
+                this.energy += this.foodsource.energy;
+                this.food += this.foodsource.food;
+                this.mood += this.foodsource.mood;
+                this.experience += this.foodsource.experience;
+            }
         }
-    },
-    fun: function () {
-        if (this.money >= -this.moodsource.price) {
-            this.money += this.moodsource.price;
-            this.energy += this.moodsource.energy;
-            this.food += this.moodsource.food;
-            this.mood += this.moodsource.mood;
-            this.experience += this.moodsource.experience;
+        ,
+        sleep: function () {
+            if (this.money >= -this.bed.price) {
+                this.money += this.bed.price;
+                this.energy += this.bed.energy;
+                this.food += this.bed.food;
+                this.mood += this.bed.mood;
+                this.experience += this.bed.experience;
+            }
         }
-    },
-    earn: function () {
-        this.money += 2;
-        this.energy -= 1;
-        this.food -= 0.5;
-        this.mood -= 0.5;
-        this.experience += 2;
-    },
-    learn: function (study) {
+        ,
+        fun: function () {
+            if (this.money >= -this.moodsource.price) {
+                this.money += this.moodsource.price;
+                this.energy += this.moodsource.energy;
+                this.food += this.moodsource.food;
+                this.mood += this.moodsource.mood;
+                this.experience += this.moodsource.experience;
+            }
+        }
+        ,
+        earn: function () {
+            this.money += 2;
+            this.energy -= 1;
+            this.food -= 0.5;
+            this.mood -= 0.5;
+            this.experience += 2;
+        }
+        ,
+        learn: function (study) {
+            this.education = study;
+            this.education.progress++;
+            this.energy += this.education.energy;
+            this.food += this.education.food;
+            this.mood += this.education.mood;
+            this.experience += this.education.experience;
+        },
+        work: function (what) {
 
-    },
-    work: function (what) {
-
-    },
-    getLevel: function () {
-
-    },
-    buy: function(item){
-
+        }
+        ,
+        getLevel: function () {
+            // not necessary at the moment
+        }
+        ,
+        buy: function (item) {
+        }
+        ,
+        sell: function (item) {
+        }
+        ,
+        buyBike: function () {
+            if (this.money >= -rents.bike.price) {
+                this.rent.bikes++;
+                this.money += rents.bike.price;
+            }
+        },
+        sellBike: function () {
+            if (this.rent.bikes > 0) {
+                this.rent.bikes--;
+                this.money += rents.bike.sellprice;
+            }
+        },
+        tick: function () {
+            this.day++;
+            this.energy -= 0.8;
+            this.food -= 0.5;
+            this.mood -= 0.3;
+            this.experience += 0.1;
+            this.money += this.education.cost_per_day;
+            this.money += this.rent.bikes * rents.bike.earn_per_day;
+            this.experience += rents.bike.earn_per_day;
+        }
     }
-
-};
-
+    ;
 var default_player = {
     'name': 'player',
     'day': 1,
@@ -169,13 +295,18 @@ var default_player = {
     'max_food': 100,
     'mood': 100,
     'max_mood': 100,
+    'rent': {
+        'bikes': 0,
+        'cars': 0,
+        'appartments': 0
+    },
     'house': houses.homeless,
     'bed': beds.hotel,
     'foodsource': foods.kebap,
     'moodsource': moods.cinema,
     'company': works.none,
     'education': educations.none,
-    'hobby': hobbies.none
+    'skill': skills.none,
 };
 
 /**
@@ -239,6 +370,7 @@ function copyPlayerData(from, to) {
     to.experience = from.experience;
     to.money = from.money;
 
+    to.rents = from.rents;
     to.energy = from.energy;
     to.max_energy = from.max_energy;
     to.food = from.food;
