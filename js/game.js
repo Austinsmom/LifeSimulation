@@ -5,11 +5,11 @@
 var rents = {
     'bike': {
         'unlock_exp': 100,
-        'price': -50,
+        'price': -100,
         'sellprice': 40,
-        'earn_per_day': 10,
+        'earn_per_day': 8,
         'exp_per_day': 1,
-        'max_amount': 10,
+        'max_amount': 10
     },
     'car': {
         'unlock_exp': 1000,
@@ -17,6 +17,7 @@ var rents = {
         'sellprice': 6000,
         'earn_per_day': 100,
         'exp_per_day': 5,
+        'max_amount': 10
 
     },
     'apparment': {
@@ -24,7 +25,8 @@ var rents = {
         'price': -250000,
         'sellprice': 180000,
         'earn_per_day': 1000,
-        'exp_per_day': 10
+        'exp_per_day': 10,
+        'max_amount': 10
     }
 };
 
@@ -99,6 +101,30 @@ var moods = {
     }
 };
 
+var companies = {
+    'bike_production_company_small': {
+        'unlock_exp': 4000,
+        'price': -10000,
+        'sellprice': 7000,
+        'earn_per_day': 2000,
+        'exp_per_day': 400,
+        'base_production': 5,
+        'bikes_per_worker': 1,
+        'max_workers': 10
+    },
+    'bike_production_company_med': {
+        'unlock_exp': 6000,
+        'price': -20000,
+        'sellprice': 15000,
+        'earn_per_day': 2000,
+        'exp_per_day': 600,
+        'base_production': 10,
+        'bikes_per_worker': 1.5,
+        'max_workers': 50
+    }
+// TODO: make option to hire new workers to earn more money (which also costs money)
+};
+
 var works = {
     'none': 0,
     'renting_company_worker': {
@@ -121,28 +147,7 @@ var works = {
         'sellprice': 0,
         'earn_per_day': 2000,
         'exp_per_day': 400
-    },
-    'bike_production_company_small': {
-        'unlock_exp': 4000,
-        'price': -10000,
-        'sellprice': 7000,
-        'earn_per_day': 2000,
-        'exp_per_day': 400,
-        'base_production': 5,
-        'bikes_per_worker': 1,
-        'max_workers': 10
-    },
-    'bike_production_company_med': {
-        'unlock_exp': 6000,
-        'price': -20000,
-        'sellprice': 15000,
-        'earn_per_day': 2000,
-        'exp_per_day': 600,
-        'base_production': 10,
-        'bikes_per_worker': 1.5,
-        'max_workers': 50
     }
-    // TODO: make option to hire new workers to earn more money (which also costs money)
 };
 
 var educations = {
@@ -170,6 +175,13 @@ var skills = {
     'programming': {}
 };
 
+var shopItems = {
+    'cheap_bed': {
+        'unlock_exp': 100,
+        'price': -300,
+        'sellprice': 200
+    }
+};
 /**
  * Represents a player.
  */
@@ -261,16 +273,21 @@ var player = {
         }
         ,
         buyBike: function () {
-            if (this.money >= -rents.bike.price) {
+            if (this.money >= -rents.bike.price && this.rent.bikes < rents.bike.max_amount) {
                 this.rent.bikes++;
                 this.money += rents.bike.price;
+                return true;
             }
+            return false;
+
         },
         sellBike: function () {
             if (this.rent.bikes > 0) {
                 this.rent.bikes--;
                 this.money += rents.bike.sellprice;
+                return true;
             }
+            return false;
         },
         tick: function () {
             this.day++;
@@ -370,7 +387,7 @@ function copyPlayerData(from, to) {
     to.experience = from.experience;
     to.money = from.money;
 
-    to.rents = from.rents;
+    to.rent = from.rent;
     to.energy = from.energy;
     to.max_energy = from.max_energy;
     to.food = from.food;

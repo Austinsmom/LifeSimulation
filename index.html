@@ -1,32 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="css/jquery.mobile-1.4.5.css"/>
+    <link rel="stylesheet" href="css/first-custom-theme.css"/>
+    <link rel="stylesheet" href="css/jquery.mobile.icons.min.css"/>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css"/>
     <script src="js/jquery-1.11.1.js"></script>
     <script src="js/jquery.mobile-1.4.5.js"></script>
-    <script src="js/app.js"></script>
-    <script>
-        $(document).on('pagebeforeshow', '#home', function (event) {
-            loadObjectsToList('#users');
-        })
-    </script>
+    <script src="js/game.js"></script>
+    <script src="js/tools.js"></script>
     <meta charset="UTF-8">
-    <title>Life Simulator</title>
+    <style>
+        #energy #food #mood .ui-slider-bg {
+            -webkit-transition: background-color 1s;
+            transition: background-color 1s;
+        }
+
+        .ui-li-static.ui-collapsible > .ui-collapsible-heading {
+                margin: 0;
+        }
+
+        .ui-li-static.ui-collapsible {
+                padding: 0;
+        }
+
+        .ui-li-static.ui-collapsible > .ui-collapsible-heading > .ui-btn {
+                border-top-width: 0;
+        }
+
+        .ui-li-static.ui-collapsible > .ui-collapsible-heading.ui-collapsible-heading-collapsed > .ui-btn,
+        .ui-li-static.ui-collapsible > .ui-collapsible-content {
+                border-bottom-width: 0;
+        }
+    </style>
+    <script>
+        var timer;
+        var playing = false;
+        var energy, food, mood;
+
+        $(function () {
+            $( "[data-role='navbar']" ).navbar();
+            // Make the header and footer as external because the should not be changed
+            $("[data-role='header'], [data-role='footer']").toolbar();
+            energy = $('#slider-energy').slider();
+            food = $('#slider-food').slider();
+            mood = $('#slider-mood').slider();
+
+            // Colored progress bar: https://jqmtricks.wordpress.com/2014/04/21/fun-with-the-slider-widget/
+            energy.on("change", function () {
+                HighlightColor($(this));
+            });
+
+            food.on("change", function () {
+                HighlightColor($(this));
+            });
+
+            mood.on("change", function () {
+                HighlightColor($(this));
+            });
+
+            retrievePlayer();
+            showCurrentData(player);
+            refreshProgressBars();
+            play();
+        });
+
+        /**
+         * Resets the color of the progress bars.
+         */
+        function refreshProgressBars() {
+            HighlightColor(energy);
+            HighlightColor(food);
+            HighlightColor(mood);
+        }
+
+        function tick() {
+            if (player.isDead()) {
+                handlePlayerDeath();
+            } else {
+                player.tick();
+
+                update(player);
+
+                if (player.isDead()) {
+                   handlePlayerDeath();
+                }
+            }
+        }
+
+        function update(player) {
+            savePlayer(player);
+            showCurrentData(player);
+        }
+
+        function pause() {
+            if (playing) {
+                clearInterval(timer);
+                $('#pause').addClass('ui-disabled');
+                $('#play').removeClass('ui-disabled');
+
+                disableActions();
+                playing = false;
+            }
+        }
+
+        function play() {
+            if (!playing && !player.isDead()) {
+                playing = true;
+                timer = window.setInterval(tick, 3000);
+                $('#pause').removeClass('ui-disabled');
+                $('#play').addClass('ui-disabled');
+
+                enableActions();
+            }
+        }
+
+        /**
+         * Restarts the game timer.
+         */
+        function restart() {
+            playing = false;
+            clearInterval(timer);
+            play();
+        }
+
+        function showCurrentData(player) {
+            $('#money').text(player.money);
+            $('#day').text(player.day);
+
+            // Show following things:
+            // Euro/day, Current amount of bikes, current progress of education
+            $('#slider-energy').val(player.energy).slider("refresh");
+            $('#slider-food').val(player.food).slider("refresh");
+            $('#slider-mood').val(player.mood).slider("refresh");
+
+            if (player.isDead()) {
+                handlePlayerDeath();
+            }
+        }
+
+        function handlePlayerDeath() {
+            $('#play').addClass('ui-disabled');
+            disableActions();
+            clearInterval(timer);
+            // $.mobile.changePage('#gameOverDialog', {transition: 'pop', role: 'dialog'});
+
+        }
+        /**
+         * Enable the action pages.
+         */
+        function enableActions() {
+            $('#basic-actions').removeClass('ui-disabled');
+            $('#work-actions').removeClass('ui-disabled');
+            $('#education-actions').removeClass('ui-disabled');
+            $('#shop-actions').removeClass('ui-disabled');
+        }
+
+        /**
+         * Disable the action pages.
+         */
+        function disableActions() {
+            $('#basic-actions').addClass('ui-disabled');
+            $('#work-actions').addClass('ui-disabled');
+            $('#education-actions').addClass('ui-disabled');
+            $('#shop-actions').addClass('ui-disabled');
+        }
+
+        //TODO: make this work for the tabs with icons instead with text
+        // Update the contents of the toolbars
+        $( document ).on( "pagecontainerchange", function() {
+            // Each of the four pages in this demo has a data-title attribute
+            // which value is equal to the text of the nav button
+            // For example, on first page: <div data-role="page" data-title="Info">
+            var current = $( ".ui-page-active" ).jqmData( "icon" );
+            // Change the heading
+            $( "[data-role='header'] h1" ).text( current );
+            // Remove active class from nav buttons
+            $( "[data-role='navbar'] a.ui-btn-active" ).removeClass( "ui-btn-active" );
+            // Add active class to current nav button
+            $( "[data-role='navbar'] a" ).each(function() {
+                if ( $( this ).jqmData("icon") === current ) {
+                    $( this ).addClass( "ui-btn-active" );
+                }
+            });
+        });
+    </script>
+    <title>Life Simulator Game</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 </head>
 <body>
-<div data-role="page" id="home">
-    <div data-role="header">
-        <h1>Life Simulation </h1>
+<header data-role="header" data-position="fixed" data-theme="c">
+    <h1>Life Simulation</h1>
+    <div style="margin-left: 10px;margin-right: 10px">
+        <div class="ui-grid-b" align="center">
+            <div class="ui-block-a">
+                <h2>Day <span id="day">0</span></h2>
+            </div>
+            <div class="ui-block-b">
+                <h2><span id="money">0</span><span id="money-per-day"> (+ 0)</span> &euro;</h2>
+            </div>
+            <div class="ui-block-c">
+                <a id="pause" href="#" class="ui-btn ui-corner-all ui-shadow" onclick="pause()">Pause</a>
+                <a id="play" href="#" class="ui-btn ui-corner-all ui-shadow" onclick="play()">Play </a>
+            </div>
+        </div>
+        <div data-mini="true">
+            <div id="energy">
+                <label for="slider-energy">Energy</label>
+                <input type="range" name="slider-energy" id="slider-energy" data-highlight="true" min="0" max="100"
+                       value="100" disabled="disabled">
+            </div>
+
+            <div id="food">
+                <label for="slider-food">Food</label>
+                <input type="range" name="slider-2" id="slider-food" data-highlight="true" min="0" max="100"
+                       value="100" disabled="disabled">
+            </div>
+            <div id="mood">
+                <label for="slider-mood">Mood</label>
+                <input type="range" name="slider-2" id="slider-mood" data-highlight="true" min="0" max="100"
+                       value="100" disabled="disabled">
+            </div>
+        </div>
     </div>
-    <div data-role="content">
-        <input type="text" name="username" placeholder="Add user .." onchange="addUser();">
-
-        <ul id="users" data-role="listview" data-inset="true">
-
+    <nav data-role="navbar">
+        <ul>
+            <li><a href="#game" data-icon="home" class="ui-btn-active ui-state-persist"></a></li>
+            <li><a href="#work" data-icon="calendar"></a></li>
+            <li><a href="#education" data-icon="clock"></a></li>
+            <li><a href="#shop" data-icon="shop"></a></li>
         </ul>
-        <br>
+    </nav>
+</header>
+<section data-role="page" id="game" data-title="Game">
+    <div class="ui-content">
+        <ul id="basic-actions" data-role="listview" data-inset="false">
+            <li><a href="#" onclick="player.earn();update(player)">
+                    <h1>Earn <span style="color:green">2 &euro;</span></h1>
+                    
+                <small>No money? Get some money ..</small>
+                    </a></li>
+            <li><a href="#" onclick="player.sleep();update(player)">
+                    <h1>Sleep in a hotel <span style="color:red">-10 &euro;</span></h1>
+                   
+                <small> You are homeless ..</small>
+                    </a></li>
+            <li><a href="#" onclick="player.eat();update(player)">
+                    <h1>Eat kebap <span style="color:red">-3 &euro;</span></h1>
+                    </a></li>
+            <li><a href="#" onclick="player.fun();update(player)">
+                    <h1>Go to the cinema <span style="color:red">-6 &euro;</span></h1>
+                    </a></li>
+        </ul>
+    </div>
+</section>
+<div data-role="page" id="work">
+    <div data-role="content">
+        <ul id="work-actions" data-role="listview">
+            <li><a href="#" onclick="player.applyForJob();update(player)">
+                    <h1>Apply for job</h1>
+                <small>You have to find a job to earn money..</small>
+                    </a></li>
+            <li data-role="collapsible" data-inset="false" data-iconpos="right">
+                <h1>Bike renting <span style="color:green">0 &euro;/day </span></h1>    
+                <ul data-role="listview" data-theme="b">
+                    <li><a href="#" onclick="player.buyBike();update(player)">
+                           <h1>Buy bike to rent <span style="color:red">-50 &euro;</span></h1>
+                            </a></li>
+                    <li><a href="#" onclick="player.sellBike();update(player)">
+                            <h1>Sell bike <span style="color:green">+50 &euro;</span></h1>
+                            </a></li>
+                </ul>
+            </li>
+        </ul>
     </div>
 </div>
+<section data-role="page" id="education">
+    <div data-role="content">
+        <ul id="education-actions" data-role="listview">
+            <li><a href="#" onclick="player.learn(educations.university);update(player)">
+                    <h1>Study at University <span style="color:red">-3 &euro;/day</span></h1>
+                    </a></li>
+        </ul>
+    </div>
+</section>
+<section data-role="page" id="shop">
+    <div data-role="content">
+        <ul id="shop-actions" data-role="listview">
+            <li>Shop items</li>
+        </ul>
+    </div>
+</section>
+<footer data-role="footer" data-position="fixed" data-theme="c" data-fullscreen="false">
+    <h2>(c) by Mathias Nigsch</h2>
+    <!-- Add dialog -->
+    <a href="#" id="reset" class="ui-btn ui-icon-delete ui-btn-icon-left ui-btn-left ui-btn-corner-all"
+       onclick="resetPlayer();showCurrentData(player);refreshProgressBars();restart()">Reset</a>
+</footer>
 </body>
 </html>
