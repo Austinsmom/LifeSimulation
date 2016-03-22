@@ -107,7 +107,7 @@ var player = {
     'education': educations.none,
     'hobby': hobbies.none,
     isDead: function () {
-        return !!(this.food < 1 || this.energy < 1 || this.mood < 1);
+        return !!(this.food <= 0 || this.energy <= 0 || this.mood <= 0);
     },
     eat: function () {
         if (this.money >= -this.foodsource.price) {
@@ -150,6 +150,9 @@ var player = {
 
     },
     getLevel: function () {
+
+    },
+    buy: function(item){
 
     }
 

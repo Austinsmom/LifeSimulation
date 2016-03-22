@@ -14,15 +14,19 @@
             -webkit-transition: background-color 1s;
             transition: background-color 1s;
         }
+
         .ui-li-static.ui-collapsible > .ui-collapsible-heading {
                 margin: 0;
         }
+
         .ui-li-static.ui-collapsible {
                 padding: 0;
         }
+
         .ui-li-static.ui-collapsible > .ui-collapsible-heading > .ui-btn {
                 border-top-width: 0;
         }
+
         .ui-li-static.ui-collapsible > .ui-collapsible-heading.ui-collapsible-heading-collapsed > .ui-btn,
         .ui-li-static.ui-collapsible > .ui-collapsible-content {
                 border-bottom-width: 0;
@@ -31,14 +35,10 @@
     <script>
         var timer;
         var playing = false;
-
-        //        $(document).on("pagecreate", "#game", function () {
-        //
-        //        });
-
         var energy, food, mood;
 
         $(function () {
+            // Make the header and footer as external because the should not be changed
             $("[data-role='header'], [data-role='footer']").toolbar();
 
             energy = $('#slider-energy').slider();
@@ -46,7 +46,6 @@
             mood = $('#slider-mood').slider();
 
             // Colored progress bar: https://jqmtricks.wordpress.com/2014/04/21/fun-with-the-slider-widget/
-
             energy.on("change", function () {
                 HighlightColor($(this));
             });
@@ -59,17 +58,16 @@
                 HighlightColor($(this));
             });
 
-            HighlightColor(energy);
-            HighlightColor(food);
-            HighlightColor(mood);
-
             retrievePlayer();
             showCurrentData(player);
+            refreshProgressBars();
             play();
-
         });
 
-        function resetProgressBarColors() {
+        /**
+         * Resets the color of the progress bars.
+         */
+        function refreshProgressBars() {
             HighlightColor(energy);
             HighlightColor(food);
             HighlightColor(mood);
@@ -77,8 +75,7 @@
 
         function tick() {
             if (player.isDead()) {
-                // Show dialog that finished
-                clearInterval(timer);
+                handlePlayerDeath();
             } else {
                 player.day++;
                 player.energy -= 0.8;
@@ -87,6 +84,10 @@
                 player.experience += 0.1;
 
                 update(player);
+
+                if (player.isDead()) {
+                   handlePlayerDeath();
+                }
             }
         }
 
@@ -100,21 +101,26 @@
                 clearInterval(timer);
                 $('#pause').addClass('ui-disabled');
                 $('#play').removeClass('ui-disabled');
-                $('#basic-actions').addClass('ui-disabled');
+
+                disableActions();
                 playing = false;
             }
         }
 
         function play() {
-            if (!playing) {
+            if (!playing && !player.isDead()) {
                 playing = true;
                 timer = window.setInterval(tick, 3000);
                 $('#pause').removeClass('ui-disabled');
                 $('#play').addClass('ui-disabled');
-                $('#basic-actions').removeClass('ui-disabled');
+
+                enableActions();
             }
         }
 
+        /**
+         * Restarts the game timer.
+         */
         function restart() {
             playing = false;
             clearInterval(timer);
@@ -130,10 +136,35 @@
             $('#slider-mood').val(player.mood).slider("refresh");
 
             if (player.isDead()) {
-                $('#play').addClass('ui-disabled');
-                $('#basic-actions').addClass('ui-disabled');
-                // $.mobile.changePage('#gameOverDialog', {transition: 'pop', role: 'dialog'});
+                handlePlayerDeath();
             }
+        }
+
+        function handlePlayerDeath() {
+            $('#play').addClass('ui-disabled');
+            disableActions();
+            clearInterval(timer);
+            // $.mobile.changePage('#gameOverDialog', {transition: 'pop', role: 'dialog'});
+
+        }
+        /**
+         * Enable the action pages.
+         */
+        function enableActions() {
+            $('#basic-actions').removeClass('ui-disabled');
+            $('#work-actions').removeClass('ui-disabled');
+            $('#education-actions').removeClass('ui-disabled');
+            $('#shop-actions').removeClass('ui-disabled');
+        }
+
+        /**
+         * Disable the action pages.
+         */
+        function disableActions() {
+            $('#basic-actions').addClass('ui-disabled');
+            $('#work-actions').addClass('ui-disabled');
+            $('#education-actions').addClass('ui-disabled');
+            $('#shop-actions').addClass('ui-disabled');
         }
     </script>
     <title>Life Simulator Game</title>
@@ -228,19 +259,23 @@
 </div>
 <section data-role="page" id="education">
     <div data-role="content">
-
+        <ul id="education-actions" data-role="listview">
+            <li></li>
+        </ul>
     </div>
 </section>
 <section data-role="page" id="shop">
     <div data-role="content">
-        <h3>Shop</h3>
+        <ul id="shop-actions" data-role="listview">
+            <li></li>
+        </ul>
     </div>
 </section>
 <footer data-role="footer" data-position="fixed" data-theme="c" data-fullscreen="false">
     <h2>(c) by Mathias Nigsch</h2>
     <!-- Add dialog -->
     <a href="#" id="reset" class="ui-btn ui-icon-delete ui-btn-icon-left ui-btn-left ui-btn-corner-all"
-       onclick="resetPlayer();resetProgressBarColors();showCurrentData(player);restart()">Reset</a>
+       onclick="resetPlayer();showCurrentData(player);refreshProgressBars();restart()">Reset</a>
 </footer>
 </body>
 </html>

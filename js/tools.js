@@ -20,7 +20,6 @@ function HighlightColor(slider) {
     }else{
         color = "#6FCC43";
     }
-    // .find("div.ui-slider-bg, div.ui-btn-active")
+
     slider.closest(".ui-slider").find("[class*='ui-slider-bg']").css("background", color);
 }
-//*[@id="energy"]/div/div/div
