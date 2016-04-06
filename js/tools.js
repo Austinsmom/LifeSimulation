@@ -21,5 +21,6 @@ function HighlightColor(slider) {
         color = "#6FCC43";
     }
 
+    // Find the div around the slider and change the background color of the created div
     slider.closest(".ui-slider").find("[class*='ui-slider-bg']").css("background", color);
 }

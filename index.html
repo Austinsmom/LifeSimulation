@@ -38,9 +38,11 @@
         var energy, food, mood;
 
         $(function () {
-            $( "[data-role='navbar']" ).navbar();
+            $("[data-role='navbar']").navbar();
             // Make the header and footer as external because the should not be changed
             $("[data-role='header'], [data-role='footer']").toolbar();
+
+            // Init the sliders
             energy = $('#slider-energy').slider();
             food = $('#slider-food').slider();
             mood = $('#slider-mood').slider();
@@ -82,7 +84,7 @@
                 update(player);
 
                 if (player.isDead()) {
-                   handlePlayerDeath();
+                    handlePlayerDeath();
                 }
             }
         }
@@ -165,21 +167,31 @@
             $('#shop-actions').addClass('ui-disabled');
         }
 
+        /**
+         * Resets the game.
+         */
+        function resetGame() {
+            resetPlayer();
+            showCurrentData(player);
+            refreshProgressBars();
+            restart()
+        }
+
         //TODO: make this work for the tabs with icons instead with text
         // Update the contents of the toolbars
-        $( document ).on( "pagecontainerchange", function() {
+        $(document).on("pagecontainerchange", function () {
             // Each of the four pages in this demo has a data-title attribute
             // which value is equal to the text of the nav button
             // For example, on first page: <div data-role="page" data-title="Info">
-            var current = $( ".ui-page-active" ).jqmData( "icon" );
+            var current = $(".ui-page-active").jqmData("icon");
             // Change the heading
-            $( "[data-role='header'] h1" ).text( current );
+            $("[data-role='header'] h1").text(current);
             // Remove active class from nav buttons
-            $( "[data-role='navbar'] a.ui-btn-active" ).removeClass( "ui-btn-active" );
+            $("[data-role='navbar'] a.ui-btn-active").removeClass("ui-btn-active");
             // Add active class to current nav button
-            $( "[data-role='navbar'] a" ).each(function() {
-                if ( $( this ).jqmData("icon") === current ) {
-                    $( this ).addClass( "ui-btn-active" );
+            $("[data-role='navbar'] a").each(function () {
+                if ($(this).jqmData("icon") === current) {
+                    $(this).addClass("ui-btn-active");
                 }
             });
         });
@@ -294,7 +306,7 @@
     <h2>(c) by Mathias Nigsch</h2>
     <!-- Add dialog -->
     <a href="#" id="reset" class="ui-btn ui-icon-delete ui-btn-icon-left ui-btn-left ui-btn-corner-all"
-       onclick="resetPlayer();showCurrentData(player);refreshProgressBars();restart()">Reset</a>
+       onclick="resetGame()">Reset</a>
 </footer>
 </body>
 </html>
